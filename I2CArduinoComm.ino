@@ -18,8 +18,11 @@ const int L2  = 7;    // yellow, d7
 const int L1  = 8;    // orange, d8
 // Lights
 const int onboardLED = 13;
+// Sensors
+int ReadPin = A3;
+int readType = 0; // 0 for analog 1 for digital
 
-void loop(){}  //  Required for Arduino main function
+void loop() { }  //  Required for Arduino main function
 
 /*
  * Light helper functions
@@ -47,6 +50,7 @@ void flashForStartup()
 const int PACKET_SIZE = 3;	// bytes
 void ReceiveEvent(int numBytes)
 {
+  Serial.println("Receive event");
 	flashOnboardLED();	// Let user know we have triggered an event
 	
 	if (0 == (numBytes % PACKET_SIZE))
@@ -63,20 +67,28 @@ void ReceiveEvent(int numBytes)
 			{
 				case 'A':
 				{
+					pinMode(pin, OUTPUT);
 					analogWrite(pin,value);
 					break;
 				}
 				case 'a':
 				{
+					pinMode(pin, INPUT);
+					ReadPin=pin;
+					readType = 0;
 					break;
 				}
 				case 'D':
 				{            
+					pinMode(pin, OUTPUT);
 					digitalWrite(pin,value?HIGH:LOW);
 					break;
 				}
 				case 'd':
 				{
+					pinMode(pin, INPUT);
+					ReadPin=pin;
+					readType = 1;
 					break;
 				}
 			}
@@ -94,16 +106,33 @@ void ReceiveEvent(int numBytes)
 	}
 }
 
+void onI2CRequest()
+{
+  Serial.println("Send event");
+  char buf[257];
+  int PinVal;
+  int len;
+if (0 == readType ) {
+  PinVal = analogRead(ReadPin);
+  len = sprintf(&buf[1],"a%d:%d;",ReadPin, PinVal);
+} else {
+  PinVal = digitalRead(ReadPin);
+  len = sprintf(&buf[1],"d%d:%d;",ReadPin, PinVal);
+}
+  buf[0] = len;
+  Serial.println(buf);
+  Wire.write(buf);
+}
+
 const int I2C_ADDRESS = 4;
 void setup()
 {
-	pinMode(L1, OUTPUT);
-	pinMode(L2, OUTPUT);
-	pinMode(L3, OUTPUT);
-	pinMode(L4, OUTPUT);
-	
+	Serial.begin(9600);
+
 	Wire.begin(I2C_ADDRESS);
+	Wire.onRequest(onI2CRequest);
 	Wire.onReceive(ReceiveEvent);
+
 	
 	flashForStartup();
 }
