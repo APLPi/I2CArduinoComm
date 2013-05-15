@@ -10,14 +10,9 @@
 
 #include <Wire.h>
 
-// Right (from front of robot) side motor pins 
-const int L4  = 3;    // yellow, d3
-const int L3  = 4;    // orange, d4
-// Left side motor pins
-const int L2  = 7;    // yellow, d7
-const int L1  = 8;    // orange, d8
 // Lights
 const int onboardLED = 13;
+const int I2C_ADDRESS = 4;
 // Sensors
 int ReadPin = A3;
 int readType = 0; // 0 for analog 1 for digital
@@ -112,19 +107,18 @@ void onI2CRequest()
   char buf[257];
   int PinVal;
   int len;
-if (0 == readType ) {
-  PinVal = analogRead(ReadPin);
-  len = sprintf(&buf[1],"a%d:%d;",ReadPin, PinVal);
-} else {
-  PinVal = digitalRead(ReadPin);
-  len = sprintf(&buf[1],"d%d:%d;",ReadPin, PinVal);
-}
+	if (0 == readType ) {
+	  PinVal = analogRead(ReadPin);
+	  len = sprintf(&buf[1],"a%d:%d;",ReadPin, PinVal);
+	} else {
+	  PinVal = digitalRead(ReadPin);
+	  len = sprintf(&buf[1],"d%d:%d;",ReadPin, PinVal);
+	}
   buf[0] = len;
   Serial.println(buf);
   Wire.write(buf);
 }
 
-const int I2C_ADDRESS = 4;
 void setup()
 {
 	Serial.begin(9600);
