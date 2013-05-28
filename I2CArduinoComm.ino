@@ -45,8 +45,8 @@ void flashForStartup()
 const int PACKET_SIZE = 3;	// bytes
 void ReceiveEvent(int numBytes)
 {
-  Serial.println("Receive event");
-	flashOnboardLED();	// Let user know we have triggered an event
+  // Serial.println("Receive event");
+	// flashOnboardLED();	// Let user know we have triggered an event
 	
 	if (0 == (numBytes % PACKET_SIZE))
 	{
@@ -56,7 +56,7 @@ void ReceiveEvent(int numBytes)
 		{
 			char	function = Wire.read();
 			byte	pin      = Wire.read(),
-					value    = Wire.read();
+				value    = Wire.read();
         
 			switch (function)
 			{
@@ -103,19 +103,19 @@ void ReceiveEvent(int numBytes)
 
 void onI2CRequest()
 {
-  Serial.println("Send event");
+  // Serial.println("Send event");
   char buf[16];
   int PinVal;
   int len;
 	if (0 == readType ) {
 	  PinVal = analogRead(ReadPin);
-	  len = sprintf(&buf[1],"a%d:%d;",ReadPin, PinVal);
+	  len = sprintf(&buf[1],"a%d:%d;", ReadPin, PinVal);
 	} else {
 	  PinVal = digitalRead(ReadPin);
-	  len = sprintf(&buf[1],"d%d:%d;",ReadPin, PinVal);
+	  len = sprintf(&buf[1],"d%d:%d;", ReadPin, PinVal);
 	}
   buf[0] = len;
-  Serial.println(buf);
+  // Serial.println(buf);
   Wire.write(buf);
 }
 
