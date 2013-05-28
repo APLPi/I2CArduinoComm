@@ -104,7 +104,7 @@ void ReceiveEvent(int numBytes)
 void onI2CRequest()
 {
   Serial.println("Send event");
-  char buf[257];
+  char buf[16];
   int PinVal;
   int len;
 	if (0 == readType ) {
