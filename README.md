@@ -1,4 +1,4 @@
 I2CArduinoComm
 ==============
 
-I2C to Arduino Communications Layer for APLBot
+This is version 0.2 of the I2C to Arduino Communications Layer for APLBot.
